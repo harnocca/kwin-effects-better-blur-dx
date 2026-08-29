@@ -365,7 +365,7 @@ void BBDX::Window::reconfigure() {
 }
 
 void BBDX::Window::getFinalBlurRegion(std::optional<KWin::RegionF> &content, std::optional<KWin::RegionF> &frame) {
-    unsigned int oldBlurOriginMask = m_blurOriginMask;
+    const auto oldBlurOriginMask = m_blurOriginMask;
 
     // always clip blur regions into the frameGeometry
     // to avoid leaving stripes outside
