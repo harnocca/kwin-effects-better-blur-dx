@@ -848,6 +848,7 @@ bool BlurEffect::shouldBlur(const EffectWindow *w, int mask, const WindowPaintDa
     return true;
 }
 
+#if KWIN_VERSION < KWIN_VERSION_CODE(6, 7, 90)
 void BlurEffect::drawWindow(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *w, int mask, const Region &deviceRegion, WindowPaintData &data)
 {
     blur(renderTarget, viewport, w, mask, deviceRegion, data);
@@ -855,6 +856,15 @@ void BlurEffect::drawWindow(const RenderTarget &renderTarget, const RenderViewpo
     // Draw the window over the blurred area
     effects->drawWindow(renderTarget, viewport, w, mask, deviceRegion, data);
 }
+#else
+bool BlurEffect::drawWindow(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *w, int mask, const Region &deviceRegion, WindowPaintData &data)
+{
+    blur(renderTarget, viewport, w, mask, deviceRegion, data);
+
+    // Draw the window over the blurred area
+    return effects->drawWindow(renderTarget, viewport, w, mask, deviceRegion, data);
+}
+#endif
 
 GLTexture *BlurEffect::ensureNoiseTexture()
 {
@@ -1056,6 +1066,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
     m_blurCache->preparePaintData(&renderTarget,
                                   &viewport,
                                   m_currentView,
+                                  &data,
                                   w,
                                   &dirtyRegion,
                                   renderInfo.framebuffers[0].get(),
@@ -1375,7 +1386,6 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
     }
 
     // BBDX:
-    m_roundedCornersPass->apply(m_windowManager.get(), backgroundRect, w, data, vbo, m_blurCache.get(), renderInfo.cache.get());
     m_blurCache->drawCached(viewport, renderInfo, vbo, vertexCount, modulation);
 
     vbo->unbindArrays();

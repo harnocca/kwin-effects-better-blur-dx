@@ -111,7 +111,11 @@ public:
 #else
     void prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data) override;
 #endif
+#if KWIN_VERSION < KWIN_VERSION_CODE(6, 7, 90)
     void drawWindow(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *w, int mask, const Region &deviceRegion, WindowPaintData &data) override;
+#else
+    bool drawWindow(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *w, int mask, const Region &deviceRegion, WindowPaintData &data) override;
+#endif
 
     bool provides(Feature feature) override;
     bool isActive() const override;
@@ -255,6 +259,7 @@ private:
 public:
     WindowManager* windowManager() const { return m_windowManager.get(); }
     BlurCache* blurCache() const { return m_blurCache.get(); }
+    RoundedCornersPass* roundedCornersPass() const { return m_roundedCornersPass.get(); }
 };
 
 inline bool BlurEffect::provides(Effect::Feature feature)
